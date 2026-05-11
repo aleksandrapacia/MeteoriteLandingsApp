@@ -193,7 +193,6 @@ ui <- fluidPage(
         
         tabPanel(
           "Mapa",
-          
           fluidRow(
             column(
               12,
@@ -201,7 +200,6 @@ ui <- fluidPage(
             )
           )
         ),
-
         tabPanel(
           "Rozkład mas",
           
@@ -212,7 +210,6 @@ ui <- fluidPage(
             )
           )
         ),
-        
         tabPanel(
           "Liczba lądowań",
           
@@ -223,11 +220,6 @@ ui <- fluidPage(
             )
           )
         ),
-        
-        # =========================
-        # Table
-        # =========================
-        
         tabPanel(
           "Tabela",
           
