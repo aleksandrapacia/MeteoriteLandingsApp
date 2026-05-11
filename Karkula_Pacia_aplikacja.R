@@ -55,14 +55,7 @@ ui <- fluidPage(
         selected = unique(meteorites$fall)
       ),
       
-      radioButtons(
-        "scale_mass",
-        "Skala wykresu mas:",
-        choices = c(
-          "Liniowa" = "identity",
-          "Logarytmiczna" = "log10"
-        )
-      )
+      
     ),
     
     mainPanel(
@@ -323,47 +316,54 @@ server <- function(input, output, session) {
       setView(lng = 0, lat = 20, zoom = 2)
   })
   
-
-  
   output$plot_mass_dist <- renderPlot({
     
     df <- data()
     
-    limit <- quantile(
-      df$mass_g,
-      0.999,
-      na.rm = TRUE
-    )
+    # usunięcie ekstremalnych outlierów
+    limit <- quantile(df$mass_g, 0.995, na.rm = TRUE)
     
     df %>%
-      filter(mass_g <= limit) %>%
+      filter(mass_g > 0,
+             mass_g <= limit) %>%
       
       ggplot(aes(x = mass_g)) +
       
       geom_histogram(
-        bins = 50,
+        bins = 40,
         fill = "#17a2b8",
-        color = "black"
+        color = "white",
+        linewidth = 0.2
       ) +
       
-      scale_x_continuous(
-        trans = input$scale_mass
+      scale_x_log10(
+        labels = scales::label_number(big.mark = " ")
       ) +
       
       labs(
         title = "Rozkład mas meteorytów",
-        x = "Masa (g)",
-        y = "Liczba"
+        x = "Masa meteorytu (g)",
+        y = "Liczba meteorytów"
       ) +
       
-      theme_minimal()
+      theme_minimal(base_size = 14) +
+      
+      theme(
+        plot.title = element_text(face = "bold"),
+        panel.grid.minor = element_blank()
+      )
   })
-
+  
   output$plot_year_hist <- renderPlot({
     
     data() %>%
+      
       group_by(year) %>%
-      summarise(count = n(), .groups = "drop") %>%
+      
+      summarise(
+        count = n(),
+        .groups = "drop"
+      ) %>%
       
       ggplot(aes(x = year, y = count)) +
       
@@ -372,13 +372,23 @@ server <- function(input, output, session) {
         linewidth = 1.2
       ) +
       
+      geom_point(
+        color = "#dc3545",
+        size = 1.5
+      ) +
+      
       labs(
         title = "Liczba lądowań w czasie",
         x = "Rok",
-        y = "Liczba"
+        y = "Liczba meteorytów"
       ) +
       
-      theme_minimal()
+      theme_minimal(base_size = 14) +
+      
+      theme(
+        plot.title = element_text(face = "bold"),
+        panel.grid.minor = element_blank()
+      )
   })
   output$data_table <- DT::renderDT({
     
